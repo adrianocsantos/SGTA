@@ -1,0 +1,42 @@
+{
+  "name": "sgta",
+  "version": "1.0.22",
+  "description": "SGTA - Suíte de Gestão Técnica da Adquirência",
+  "type": "module",
+  "main": "backend/launcher.js",
+  "bin": "backend/launcher.js",
+  "scripts": {
+    "start": "node ./backend/launcher.js",
+    "agent": "node ./agent/agentLauncher.js",
+    "bundle": "node scripts/embed-frontend.js && esbuild backend/launcher.js --bundle --platform=node --target=node18 --outfile=build/server-bundle.js --format=cjs --define:import.meta.url=__filename",
+    "bundle-agent": "esbuild agent/agentLauncher.js --bundle --platform=node --target=node18 --outfile=build/agent-bundle.js --format=cjs --define:import.meta.url=__filename",
+    "build": "node scripts/build.js",
+    "build:no-bump": "npm run bundle && npm run bundle-agent && pkg build/server-bundle.js --targets node18-win-x64,node18-linux-x64 --out-path dist && pkg build/agent-bundle.js --targets node18-win-x64,node18-linux-x64 --out-path dist/agent && npm run copy-config",
+    "copy-config": "node scripts/build.js --prepare-only"
+  },
+  "keywords": [
+    "log",
+    "reader",
+    "realtime"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@xterm/xterm": "^6.0.0",
+    "express": "^5.2.1",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.3"
+  },
+  "devDependencies": {
+    "esbuild": "^0.18.16",
+    "pkg": "^5.8.1"
+  },
+  "pkg": {
+    "assets": [],
+    "targets": [
+      "node18-win-x64",
+      "node18-linux-x64"
+    ],
+    "outputPath": "dist"
+  }
+}

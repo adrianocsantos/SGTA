@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+  <title>SGTA - Suíte de Gestão Técnica da Adquirência</title>
+  <link rel="stylesheet" href="xterm.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo-dot" aria-hidden="true">SGTA</div>
+        <div>
+          <p class="eyebrow">Operações de TI</p>
+          <h1>SGTA</h1>
+        </div>
+      </div>
+      <nav class="module-menu" aria-label="Módulos do SGTA">
+        <button class="module-tab active" type="button" data-view="overview" aria-selected="true" title="Visão geral"><span class="module-icon" aria-hidden="true">⌂</span><span class="module-label">Visão geral</span></button>
+        <button class="module-tab" type="button" data-view="log-reader" aria-selected="false" title="Leitor de logs"><span class="module-icon" aria-hidden="true">≡</span><span class="module-label">Leitor de logs</span></button>
+        <button class="module-tab" type="button" data-view="carga-tabelas" aria-selected="false" title="Carga de tabelas"><span class="module-icon" aria-hidden="true">⇄</span><span class="module-label">Carga de tabelas</span></button>
+        <button class="module-tab" type="button" data-view="iso-parser" aria-selected="false" title="Parser ISO"><span class="module-icon" aria-hidden="true">⌗</span><span class="module-label">Parser ISO</span></button>
+        <button class="module-tab" type="button" data-view="ssh" aria-selected="false" title="Operações remotas"><span class="module-icon" aria-hidden="true">›_</span><span class="module-label">Operações remotas</span></button>
+        <button class="module-tab" type="button" data-view="demands" aria-selected="false" title="Gestão de demandas"><span class="module-icon" aria-hidden="true">▦</span><span class="module-label">Gestão de demandas</span></button>
+        <button class="module-tab" type="button" data-view="config" aria-selected="false" title="Configurações"><span class="module-icon" aria-hidden="true">⚙</span><span class="module-label">Configurações</span></button>
+      </nav>
+      <div class="sidebar-footer">
+        <div id="licenseInfo" class="license-info">Licença: carregando...</div>
+        <div id="licenseWarning" class="license-warning hidden" aria-live="polite"></div>
+        <div class="company-signature"><span>por</span> AS Solutions</div>
+        <span id="appVersion" class="app-version">SGTA v1.0.0</span>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div><p class="topbar-kicker">Suíte de Gestão Técnica da Adquirência</p><h2 id="viewTitle">Visão geral</h2></div>
+        <div class="status-chip"><span class="pulse"></span><span id="statusLabel">Sistema online</span></div>
+      </header>
+
+      <section class="view-stack">
+      <section class="view-panel active" data-panel="overview">
+        <div class="overview-hero">
+          <div><p class="parser-kicker">Central operacional</p><h2>Bom trabalho.</h2><p>Monitore aplicações, processe cargas e opere agentes remotos em um só lugar.</p></div>
+          <button class="primary overview-action" type="button" data-open-view="log-reader">Abrir leitor de logs</button>
+        </div>
+        <div class="metric-grid">
+          <article class="metric-card"><span>Aplicações</span><strong id="overviewApplications">—</strong><small>fontes configuradas</small></article>
+          <article class="metric-card"><span>Agentes remotos</span><strong id="overviewAgents">—</strong><small>serviços cadastrados</small></article>
+          <article class="metric-card"><span>Licença</span><strong id="overviewLicense">Verificando</strong><small id="overviewLicenseDetail">consultando validade</small></article>
+          <article class="metric-card"><span>Versão</span><strong id="overviewVersion">1.0.0</strong><small>instalação atual</small></article>
+        </div>
+        <div class="quick-grid">
+          <button class="quick-card" type="button" data-open-view="log-reader"><span class="quick-icon">≡</span><span><strong>Investigar logs</strong><small>Acompanhar eventos em tempo real</small></span><b>→</b></button>
+          <button class="quick-card" type="button" data-open-view="carga-tabelas"><span class="quick-icon">⇄</span><span><strong>Processar carga</strong><small>Validar registros posicionais</small></span><b>→</b></button>
+          <button class="quick-card" type="button" data-open-view="ssh"><span class="quick-icon">›_</span><span><strong>Operar servidor</strong><small>Executar comandos via agente</small></span><b>→</b></button>
+        </div>
+      </section>
+
+      <div class="view-panel" data-panel="log-reader">
+        <section class="toolbar">
+          <div class="select-wrap">
+            <label for="systemSelect">Sistema</label>
+            <select id="systemSelect">
+              <option value="">Carregando aplicações...</option>
+            </select>
+          </div>
+          <div class="actions">
+            <button class="ghost" id="reload">↺ Log completo</button>
+            <button class="primary" id="tailRealtime">▶ Real Time</button>
+            <button class="danger" id="stopTail">■ Parar</button>
+            <button class="ghost" id="exportTail">⇩ Exportar</button>
+          </div>
+        </section>
+
+        <section class="log-tools" aria-label="Ferramentas do log">
+          <label class="log-search"><span aria-hidden="true">⌕</span><input id="logSearch" type="search" placeholder="Buscar no log" aria-label="Buscar no conteúdo do log" /></label>
+          <select id="logLevelFilter" aria-label="Filtrar por nível"><option value="">Todos os níveis</option><option value="ERROR">ERROR</option><option value="WARN">WARN</option><option value="INFO">INFO</option><option value="DEBUG">DEBUG</option></select>
+          <span id="logMatchCount" class="log-match-count">0 linhas</span>
+          <span id="logErrorCount" class="log-level-count error">0 erros</span>
+          <span id="logWarnCount" class="log-level-count warn">0 alertas</span>
+          <button class="ghost compact" id="toggleLogWrap" type="button" aria-pressed="true">Quebra de linha</button>
+          <button class="ghost compact icon-button" id="decreaseLogFont" type="button" aria-label="Diminuir fonte" title="Diminuir fonte">A−</button>
+          <button class="ghost compact icon-button" id="increaseLogFont" type="button" aria-label="Aumentar fonte" title="Aumentar fonte">A+</button>
+          <button class="ghost compact" id="pauseLogDisplay" type="button" aria-pressed="false">Pausar tela</button>
+          <button class="ghost compact" id="toggleAutoScroll" type="button" aria-pressed="true">Auto-scroll</button>
+          <button class="ghost compact icon-button" id="copyLogLine" type="button" aria-label="Copiar linha selecionada" title="Copiar linha selecionada" disabled>⧉</button>
+          <button class="ghost compact" id="scrollLogBottom" type="button">Ir para o final ↓</button>
+          <button class="ghost compact icon-button" id="maximizeLog" type="button" aria-label="Maximizar caixa de leitura" title="Maximizar caixa de leitura">⛶</button>
+        </section>
+
+        <section class="panel" id="logPanel">
+          <pre id="log"></pre>
+        </section>
+      </div>
+
+      <section class="view-panel" data-panel="carga-tabelas">
+        <div class="panel parser-panel">
+          <div class="parser-card carga-card">
+            <header class="carga-header">
+              <div>
+                <p class="parser-kicker">Análise de dados posicionais</p>
+                <h2>Carga de Tabelas</h2>
+                <p class="parser-description">Processe cargas TEF e explore registros e alertas. O layout POS ainda não está disponível.</p>
+              </div>
+              <span class="parser-badge" id="cargaTabelasStatus">Carregando status...</span>
+            </header>
+            <section class="carga-input-panel" aria-labelledby="cargaEntradaTitulo">
+              <div class="carga-section-header">
+                <div><p class="carga-step">01 / ENTRADA</p><h3 id="cargaEntradaTitulo">Preparar carga</h3></div>
+                <span id="cargaTabelasCount" class="carga-count">0 caracteres</span>
+              </div>
+              <div class="parser-form">
+              <div class="select-wrap">
+                <label for="cargaTabelasTipo">Formato</label>
+                <select id="cargaTabelasTipo">
+                  <option value="auto">Automático</option>
+                  <option value="tef">TEF</option>
+                  <option value="pos">POS (pendente)</option>
+                </select>
+              </div>
+              <label class="parser-field" for="cargaTabelasInput">
+                <span>String posicional</span>
+                <textarea id="cargaTabelasInput" spellcheck="false" placeholder="Cole aqui a string de Carga de Tabelas para processar"></textarea>
+              </label>
+              </div>
+              <p class="carga-hint">O contador considera o texto como digitado. As posições dos alertas usam a carga sem quebras de linha e sem espaços nas extremidades.</p>
+              <div class="parser-actions">
+                <button class="primary" id="processCargaTabelas">Processar carga</button>
+                <button class="ghost" id="clearCargaTabelas" type="button">Limpar</button>
+                <button class="ghost" id="refreshCargaTabelasStatus">Atualizar status</button>
+              </div>
+            </section>
+            <section class="parser-output-wrap carga-result-panel" id="parsedOutputWrap" aria-labelledby="cargaResultadoTitulo">
+              <div class="carga-section-header">
+                <div><p class="carga-step">02 / RESULTADO</p><h3 id="cargaResultadoTitulo">Análise da carga</h3></div>
+              </div>
+              <div id="cargaTabelasSummary" class="carga-summary hidden" aria-live="polite"></div>
+              <div id="cargaTabelasWarnings" class="parser-warnings hidden" aria-live="polite"></div>
+              <div id="cargaTabelasRecordTools" class="carga-record-tools hidden">
+                <label for="cargaTabelasSearch">Buscar registros</label>
+                <input id="cargaTabelasSearch" type="search" placeholder="Tipo, nome, campo ou valor">
+              <div class="parser-group-actions">
+                <button class="ghost" id="expandAllParsedGroups">Expandir tipos</button>
+                <button class="ghost" id="collapseAllParsedGroups">Minimizar tipos</button>
+              </div>
+              </div>
+              <div id="parsedRecordsContainer" class="parsed-records"></div>
+              <pre class="parser-output" id="cargaTabelasOutput">Cole uma carga e selecione Processar carga para visualizar os resultados.</pre>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="view-panel" data-panel="iso-parser">
+        <div class="panel parser-panel">
+          <div class="parser-card iso-card">
+            <p class="parser-kicker">Ferramenta de mensagens</p>
+            <h2>Parser de mensagem ISO 8583</h2>
+            <p class="parser-description">Cole a mensagem ISO como texto de bytes ou em hexadecimal. Para campos binários, prefira o hexadecimal dos bytes originais: ao copiar texto, alguns bytes podem ser alterados.</p>
+            <div class="parser-form iso-form">
+              <div class="select-wrap">
+                <label for="isoParserProfile">Perfil</label>
+                <select id="isoParserProfile">
+                  <option value="auto">Automático pelo MTI</option>
+                  <option value="iso8583">ISO8583_Parse3</option>
+                  <option value="iso8583_93">ISO8583_93</option>
+                </select>
+              </div>
+              <div class="select-wrap">
+                <label for="isoParserInputFormat">Formato da entrada</label>
+                <select id="isoParserInputFormat">
+                  <option value="ascii">Texto de bytes (ASCII / Latin-1)</option>
+                  <option value="hex">Hexadecimal</option>
+                </select>
+              </div>
+              <div class="select-wrap">
+                <label for="isoPinBlockEncoding">Codificação do DE052 (PIN block)</label>
+                <select id="isoPinBlockEncoding">
+                  <option value="text">Texto hexadecimal (16 caracteres)</option>
+                  <option value="binary">Binário (8 bytes)</option>
+                </select>
+              </div>
+              <label class="parser-field iso-message-field" for="isoMessageInput">
+                <span>Mensagem ISO</span>
+                <textarea id="isoMessageInput" rows="4" spellcheck="false" placeholder="Cole aqui a mensagem ISO8583 completa, começando pelo MTI."></textarea>
+              </label>
+            </div>
+            <div class="parser-actions">
+              <button class="primary" id="parseIsoMessage" type="button">Processar mensagem</button>
+              <button class="ghost" id="clearIsoMessage" type="button">Limpar</button>
+            </div>
+            <div id="isoParserStatus" class="iso-parser-status" role="status" aria-live="polite">Aguardando mensagem ISO.</div>
+            <div id="isoParserResults" class="iso-parser-results" aria-live="polite">
+              <p class="empty-state">Os campos interpretados serão exibidos aqui.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view-panel" data-panel="ssh">
+        <div class="panel parser-panel">
+          <div class="parser-card">
+            <p class="parser-kicker">Acesso remoto via agente</p>
+            <h2>Operações Remotas</h2>
+            <p class="parser-description">
+              Execute comandos (como reiniciar a aplicação) no servidor remoto através do agente SGTA já instalado nele, sem precisar de usuário/senha de SSH. É necessário habilitar <code>ALLOW_EXEC: true</code> no <code>agent.config.js</code> do servidor de destino.
+            </p>
+            <div class="remote-auth-banner" id="remoteOperationsAuthBanner">
+              <span>Acesso às operações remotas bloqueado até autenticação.</span>
+              <button class="primary" id="remoteOperationsLoginBtn" type="button">Autenticar</button>
+            </div>
+            <div id="remoteOperationsControls" class="hidden">
+              <div class="remote-agent-toolbar">
+                <div class="select-wrap remote-agent-select">
+                  <label for="execAgentSource">Agente</label>
+                  <select id="execAgentSource"><option value="">Selecione um agente</option></select>
+                </div>
+                <span class="remote-agent-identity" id="remoteAgentIdentity">Nenhum agente selecionado</span>
+                <span class="remote-agent-status" id="terminalStatus" data-state="disconnected">Desconectado</span>
+                <div class="remote-admin-actions">
+                  <button class="ghost remote-auth-manage hidden" id="remoteOperationsManagePasswords" type="button">Gerenciar acessos</button>
+                  <button class="ghost remote-auth-logout hidden" id="remoteOperationsLogout" type="button">Sair</button>
+                </div>
+              </div>
+              <nav class="remote-workspace-tabs" role="tablist" aria-label="Área de trabalho remota">
+                <button id="remoteTabTerminal" class="remote-workspace-tab active" type="button" role="tab" aria-controls="remotePanelTerminal" aria-selected="true" data-remote-tab="terminal">Terminal</button>
+                <button id="remoteTabFiles" class="remote-workspace-tab" type="button" role="tab" aria-controls="remotePanelFiles" aria-selected="false" data-remote-tab="files">Arquivos</button>
+              </nav>
+              <section id="remotePanelTerminal" class="remote-workspace-panel active" role="tabpanel" aria-labelledby="remoteTabTerminal" data-remote-panel="terminal">
+                <section class="interactive-terminal-section">
+                  <div class="section-heading">
+                    <h3>Terminal interativo Linux</h3>
+                    <div class="parser-actions">
+                      <button class="ghost compact icon-button" id="expandTerminal" type="button" aria-label="Expandir área do terminal" title="Expandir área do terminal">⤢</button>
+                      <button class="ghost compact icon-button" id="fullscreenTerminal" type="button" aria-label="Abrir terminal em tela cheia" title="Abrir terminal em tela cheia">⛶</button>
+                      <button class="ghost compact" id="terminalScrollBottom" type="button" title="Ir para o fim da saída">↓ Fim</button>
+                      <button class="primary" id="terminalConnectBtn" type="button">Abrir terminal</button>
+                      <button class="ghost hidden" id="terminalDisconnectBtn" type="button">Encerrar</button>
+                    </div>
+                  </div>
+                  <div id="interactiveTerminal" class="interactive-terminal" aria-label="Terminal remoto interativo"></div>
+                  <div class="config-feedback hidden" id="terminalFeedback" aria-live="polite"></div>
+                </section>
+              </section>
+              <section id="remotePanelFiles" class="remote-workspace-panel" role="tabpanel" aria-labelledby="remoteTabFiles" data-remote-panel="files" hidden>
+                <section class="agent-config-section remote-files-section">
+                  <h3>Explorador de arquivos</h3>
+                  <form class="exec-command-form" id="fsBrowseForm">
+                    <label class="parser-field" for="fsBrowsePath">
+                      <span>Caminho</span>
+                      <input id="fsBrowsePath" type="text" placeholder="Ex.: C:\logs ou /var/log" autocomplete="off" />
+                    </label>
+                    <div class="parser-actions">
+                      <button class="ghost" id="fsBrowseUpBtn" type="button" aria-label="Subir uma pasta" title="Subir uma pasta">↑</button>
+                      <button class="primary" id="fsBrowseBtn" type="submit">Abrir pasta</button>
+                    </div>
+                  </form>
+                  <div class="config-feedback hidden" id="fsBrowseFeedback" aria-live="polite"></div>
+                  <div class="remote-files-workspace">
+                    <div class="fs-browse-list" id="fsBrowseList"></div>
+                    <section class="fs-editor hidden" id="fsEditor" aria-label="Editor de arquivo remoto">
+                      <div class="section-heading">
+                        <strong id="fsEditorPath"></strong>
+                        <div class="parser-actions">
+                          <button class="ghost" id="fsEditorCancelBtn" type="button">Cancelar</button>
+                          <button class="primary" id="fsEditorSaveBtn" type="button">Salvar</button>
+                        </div>
+                      </div>
+                      <textarea id="fsEditorContent" spellcheck="false" aria-label="Conteúdo do arquivo remoto"></textarea>
+                    </section>
+                  </div>
+                </section>
+              </section>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view-panel" data-panel="demands">
+        <div class="demand-header">
+          <div><p class="parser-kicker">Planejamento operacional</p><h2>Gestão de Demandas</h2><p class="parser-description">Organize atividades técnicas e acompanhe o fluxo de trabalho da equipe.</p></div>
+          <button class="primary" id="newDemand" type="button">+ Nova demanda</button>
+        </div>
+        <div class="demand-toolbar">
+          <label class="log-search"><span aria-hidden="true">⌕</span><input id="demandSearch" type="search" placeholder="Buscar demandas" aria-label="Buscar demandas" /></label>
+          <select id="demandProjectFilter" aria-label="Filtrar por projeto"><option value="">Todos os projetos</option></select>
+          <select id="demandPriorityFilter" aria-label="Filtrar por prioridade"><option value="">Todas as prioridades</option><option value="urgent">Urgente</option><option value="high">Alta</option><option value="medium">Média</option><option value="low">Baixa</option></select>
+          <span id="demandSummary" class="log-match-count">Carregando...</span>
+        </div>
+        <div class="kanban-board" id="kanbanBoard">
+          <section class="kanban-column" data-status="backlog"><header><span>Backlog</span><b>0</b></header><div class="kanban-list" data-demand-list="backlog"></div></section>
+          <section class="kanban-column" data-status="todo"><header><span>A Fazer</span><b>0</b></header><div class="kanban-list" data-demand-list="todo"></div></section>
+          <section class="kanban-column" data-status="doing"><header><span>Em andamento</span><b>0</b></header><div class="kanban-list" data-demand-list="doing"></div></section>
+          <section class="kanban-column" data-status="blocked"><header><span>Bloqueado</span><b>0</b></header><div class="kanban-list" data-demand-list="blocked"></div></section>
+          <section class="kanban-column" data-status="done"><header><span>Concluído</span><b>0</b></header><div class="kanban-list" data-demand-list="done"></div></section>
+        </div>
+        <div id="demandFeedback" class="config-feedback hidden" aria-live="polite"></div>
+      </section>
+
+      <section class="view-panel" data-panel="config">
+        <div class="panel parser-panel config-parser-panel">
+          <div class="parser-card config-card">
+            <p class="parser-kicker">Ajustes do serviço</p>
+            <h2>Configuração</h2>
+            <p class="parser-description">
+              Ajuste o arquivo de log monitorado, limites de leitura e a porta do serviço sem editar o arquivo manualmente.
+            </p>
+            <div class="remote-auth-banner" id="configurationAuthBanner">
+              <span>Configurações bloqueadas até autenticação.</span>
+              <button class="primary" type="button" data-remote-auth-open>Autenticar</button>
+            </div>
+            <button class="ghost remote-auth-logout hidden" id="configurationLogout" type="button">Sair</button>
+            <div id="configurationControls" class="hidden">
+            <div class="parser-meta config-meta">
+              <span class="parser-badge" id="configStatusBadge">Carregando configuração...</span>
+              <span class="config-meta-text" id="configRestartHint">Verificando modo de aplicação...</span>
+            </div>
+            <form class="config-form" id="configForm">
+              <label class="parser-field config-field" for="configPath">
+                <span>Caminho do log</span>
+                <input id="configPath" name="configPath" type="text" placeholder="Caminho do arquivo de log" />
+              </label>
+              <div class="config-sources-section">
+                <div class="config-section-header">
+                  <div class="config-section-title">Aplicações para leitura</div>
+                  <button class="ghost config-add-source" id="addConfigSource" type="button">+ Adicionar aplicação</button>
+                </div>
+                <details class="config-sources-disclosure">
+                  <summary>Editar aplicações cadastradas</summary>
+                  <div class="config-sources-list" id="configSourcesList"></div>
+                </details>
+              </div>
+              <label class="parser-field config-field" for="configEncoding">
+                <span>Encoding</span>
+                <input id="configEncoding" name="configEncoding" type="text" placeholder="utf-8" />
+              </label>
+              <label class="parser-field config-field" for="configMaxBytes">
+                <span>Tamanho máximo do log em bytes</span>
+                <input id="configMaxBytes" name="configMaxBytes" type="number" min="1" step="1" />
+              </label>
+              <label class="parser-field config-field" for="configMaxLines">
+                <span>Máximo de linhas por leitura</span>
+                <input id="configMaxLines" name="configMaxLines" type="number" min="1" step="1" />
+              </label>
+              <label class="parser-field config-field" for="configPort">
+                <span>Porta do servidor</span>
+                <input id="configPort" name="configPort" type="number" min="1" max="65535" step="1" />
+              </label>
+            </form>
+            <div class="parser-actions">
+              <button class="primary" id="saveConfig" type="button">Salvar configuração</button>
+              <button class="ghost" id="reloadConfig" type="button">Recarregar</button>
+              <button class="ghost" id="resetConfig" type="button">Restaurar valores</button>
+            </div>
+            <div class="config-feedback hidden" id="configFeedback" aria-live="polite"></div>
+            <div class="config-file" id="configFilePath">Arquivo: carregando...</div>
+            <details class="config-disclosure">
+              <summary>Atualização de licença</summary>
+              <section class="agent-config-section" aria-labelledby="licenseUploadTitle">
+                <h3 id="licenseUploadTitle">Atualização de licença</h3>
+                <p class="parser-description">Selecione o arquivo de licença TBB válido para este servidor. A licença atual só será substituída depois que o arquivo enviado for validado.</p>
+                <div class="agent-config-toolbar">
+                  <input id="licenseUploadFile" type="file" accept=".lic,application/octet-stream" aria-label="Arquivo de licença TBB" />
+                  <button class="primary" id="uploadLicense" type="button">Atualizar licença</button>
+                </div>
+                <div class="config-feedback hidden" id="licenseUploadFeedback" aria-live="polite"></div>
+              </section>
+            </details>
+            <details class="config-disclosure" id="genericUploadSection">
+              <summary>Envio de arquivos</summary>
+              <section class="agent-config-section" aria-labelledby="genericUploadTitle">
+                <h3 id="genericUploadTitle">Enviar arquivo para servidor ou agente</h3>
+                <p class="parser-description">Os arquivos são salvos em <code>uploads/</code> na pasta da aplicação de destino. Limite de 100 MB; nomes já existentes não são substituídos.</p>
+                <div class="agent-config-toolbar">
+                  <select id="genericUploadTarget" aria-label="Servidor de destino"><option value="server">Servidor central</option></select>
+                  <input id="genericUploadFile" type="file" aria-label="Arquivo para enviar" />
+                  <button class="primary" id="uploadGenericFile" type="button">Enviar arquivo</button>
+                </div>
+                <div class="config-feedback hidden" id="genericUploadFeedback" aria-live="polite"></div>
+              </section>
+            </details>
+            <details class="config-disclosure">
+              <summary>Atualização de binário</summary>
+              <section class="agent-config-section" aria-labelledby="binaryUpdateTitle">
+              <h3 id="binaryUpdateTitle" class="hidden">Atualização de binário</h3>
+              <p class="parser-description">Após o build, selecione o executável de destino em <code>dist/</code>: Linux usa <code>sgta</code> e Windows usa <code>sgta.exe</code>; para agente, selecione o equivalente em <code>dist/agent/</code>. Aplicar ou reverter reinicia o serviço automaticamente.</p>
+              <div class="agent-config-toolbar">
+                <select id="binaryUpdateTarget" aria-label="Destino da atualização"><option value="server">Servidor central</option></select>
+                <input id="binaryUpdateFile" type="file" aria-label="Novo binário" />
+                <button class="primary" id="stageBinaryUpdate" type="button">Preparar atualização</button>
+              </div>
+              <div class="agent-config-toolbar">
+                <input id="binaryUpdateSession" type="text" readonly placeholder="Sessão preparada" aria-label="Sessão de atualização" />
+                <button class="ghost" id="applyBinaryUpdate" type="button">Aplicar</button>
+                <button class="danger" id="rollbackBinaryUpdate" type="button">Reverter backup</button>
+              </div>
+              <div class="config-feedback hidden" id="binaryUpdateFeedback" aria-live="polite"></div>
+              </section>
+            </details>
+            <details class="config-disclosure">
+              <summary>Configuração do agente remoto</summary>
+              <section class="agent-config-section">
+              <h3 class="hidden">Configuração do agente remoto</h3>
+              <p class="parser-description">Selecione uma aplicação remota cadastrada, carregue sua configuração e salve as alterações no agente.</p>
+              <div class="agent-config-toolbar">
+                <select id="agentConfigSource"><option value="">Selecione um agente</option></select>
+                <button class="ghost" id="loadAgentConfig" type="button">Carregar agente</button>
+                <button class="primary" id="saveAgentConfig" type="button">Salvar no agente</button>
+              </div>
+              <textarea id="agentConfigEditor" class="agent-config-editor" spellcheck="false" placeholder="Configuração JSON do agente"></textarea>
+              <div class="config-feedback hidden" id="agentConfigFeedback" aria-live="polite"></div>
+              </section>
+            </details>
+            </div>
+          </div>
+        </div>
+      </section>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="demandDialog" class="demand-dialog">
+    <form id="demandForm">
+      <input id="demandId" type="hidden" />
+      <div class="dialog-heading"><div><p class="parser-kicker">Demanda</p><h2 id="demandDialogTitle">Nova demanda</h2></div><button class="ghost icon-button" id="closeDemandDialog" type="button" aria-label="Fechar">✕</button></div>
+      <label class="parser-field"><span>Título *</span><input id="demandTitle" type="text" maxlength="180" required /></label>
+      <label class="parser-field"><span>Projeto</span><input id="demandProject" type="text" maxlength="120" list="demandProjectOptions" placeholder="Ex.: Implantação TEF" /><datalist id="demandProjectOptions"></datalist></label>
+      <label class="parser-field"><span>Descrição</span><textarea id="demandDescription" rows="4" maxlength="5000"></textarea></label>
+      <div class="demand-form-grid">
+        <label class="parser-field"><span>Responsável</span><input id="demandAssignee" type="text" maxlength="100" /></label>
+        <label class="parser-field"><span>Categoria / sistema</span><input id="demandCategory" type="text" maxlength="100" /></label>
+        <label class="parser-field"><span>Prioridade</span><select id="demandPriority"><option value="low">Baixa</option><option value="medium" selected>Média</option><option value="high">Alta</option><option value="urgent">Urgente</option></select></label>
+        <label class="parser-field"><span>Prazo</span><input id="demandDueDate" type="date" /></label>
+        <label class="parser-field"><span>Coluna</span><select id="demandStatus"><option value="backlog">Backlog</option><option value="todo">A Fazer</option><option value="doing">Em andamento</option><option value="blocked">Bloqueado</option><option value="done">Concluído</option></select></label>
+        <label class="parser-field"><span>Etiquetas</span><input id="demandTags" type="text" placeholder="Ex.: TEF, produção, urgente" /></label>
+      </div>
+      <section class="subtask-section" aria-labelledby="subtaskTitle">
+        <div class="subtask-heading"><div><strong id="subtaskTitle">Subtarefas</strong><small id="subtaskSummary">0 de 0 concluídas</small></div><button class="ghost small-button" id="addSubtask" type="button">+ Adicionar</button></div>
+        <div id="subtaskList" class="subtask-list"></div>
+      </section>
+      <div class="dialog-actions demand-dialog-actions"><button class="danger hidden" id="deleteDemand" type="button">Excluir</button><span></span><button class="ghost" id="cancelDemand" type="button">Cancelar</button><button class="primary" type="submit">Salvar demanda</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="remoteOperationsAuthDialog" class="confirm-dialog remote-auth-dialog">
+    <form id="remoteOperationsAuthForm">
+      <div class="dialog-icon" aria-hidden="true">●</div>
+      <h2 id="remoteOperationsAuthTitle">Autenticar Operações Remotas</h2>
+      <p id="remoteOperationsAuthDescription">Entre com usuário e senha para liberar comandos e acesso aos agentes.</p>
+      <label class="parser-field" for="remoteOperationsUsername"><span>Usuário</span><input id="remoteOperationsUsername" type="text" value="admin" autocomplete="username" required /></label>
+      <label class="parser-field" for="remoteOperationsPassword"><span>Senha</span><input id="remoteOperationsPassword" type="password" autocomplete="current-password" required /></label>
+      <label class="parser-field hidden" id="remoteOperationsPasswordConfirmField" for="remoteOperationsPasswordConfirm"><span>Confirmar senha mestra</span><input id="remoteOperationsPasswordConfirm" type="password" autocomplete="new-password" /></label>
+      <div class="config-feedback hidden" id="remoteOperationsAuthFeedback" aria-live="polite"></div>
+      <div class="dialog-actions"><button class="ghost" id="remoteOperationsAuthCancel" type="button">Voltar</button><button class="primary" id="remoteOperationsAuthSubmit" type="submit">Entrar</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="remoteOperationsCredentialsDialog" class="confirm-dialog remote-auth-dialog">
+    <form id="remoteOperationsCredentialsForm">
+      <div class="dialog-heading"><div><p class="parser-kicker">Administração</p><h2>Credenciais de operações</h2></div><button class="ghost icon-button" id="remoteOperationsCredentialsClose" type="button" aria-label="Fechar">✕</button></div>
+      <label class="parser-field" for="remoteCredentialUsername"><span>Nome de acesso</span><input id="remoteCredentialUsername" type="text" minlength="3" maxlength="40" autocomplete="off" required /></label>
+      <label class="parser-field" for="remoteCredentialPassword"><span>Senha (mínimo 12 caracteres)</span><input id="remoteCredentialPassword" type="password" minlength="12" autocomplete="new-password" required /></label>
+      <label class="parser-field" for="remoteCredentialExpiry"><span>Validade</span><select id="remoteCredentialExpiry"><option value="0">Permanente</option><option value="1">1 hora</option><option value="8">8 horas</option><option value="24">24 horas</option><option value="168">7 dias</option></select></label>
+      <div class="dialog-actions"><span></span><button class="primary" id="remoteCredentialCreateBtn" type="submit">Criar acesso</button></div>
+      <div class="config-feedback hidden" id="remoteCredentialFeedback" aria-live="polite"></div>
+      <section class="remote-credentials-list-section"><h3>Acessos ativos</h3><div id="remoteCredentialsList" class="remote-credentials-list"></div></section>
+    </form>
+  </dialog>
+
+  <script src="socket.io.js"></script>
+  <script src="xterm.js"></script>
+  <script type="module" src="iso-parser.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+node_modules/
+dist/
+build/
+logs/
+data/
+.DS_Store
+backend/configLogs.js.backup
+*.log
+license/
+nul
